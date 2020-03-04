@@ -1,5 +1,5 @@
 # findPhoto
-# python+selenium爬取某站Cos区首页图片
+# python+selenium爬取某站图片
 
 # 使用selenium模拟浏览器爬某站的图片
 # 注意要下载对应的chromedriver驱动并解压到同一目录下（或者添加驱动程序到环境变量中），否则会报错
