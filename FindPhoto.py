@@ -9,25 +9,24 @@ def find_Url(downloadWebsite):
     #个人觉得打开网页碍眼，设置了selenium不打开网页进行爬数据,使用过程会有个报错但是不妨碍程序运行
     option = webdriver.ChromeOptions()
     option.set_headless()
-    driver = webdriver.Chrome(chrome_options = option)
 
-    #模拟浏览器,等待5秒,等网页加载动态资源完毕
-    driver.get(downloadWebsite)
-    time.sleep(5)
+    for web in downloadWebsite:
+        driver = webdriver.Chrome(chrome_options=option)
+        driver.get(web)
+        time.sleep(5)
 
-    #定位链接位置,可通过浏览器开发者工具的源码查看具体位置
-    urlList = driver.find_elements_by_xpath("//ul[@class='clearfix']/li[@class='photo-item']")
+        #定位链接位置,可通过浏览器开发者工具的源码查看具体位置
+        urlList = driver.find_elements_by_xpath("//ul[@class='clearfix']/li[@class='photo-item']")
+        #在所有li中随机抽取5个链接添加到链接合集
+        urlList2 = random.sample(urlList, 5)
+        print("urlList2:")
+        print(urlList2)
+        for url in urlList2:
+            webUrl = url.find_element_by_tag_name("a").get_attribute("href")
+            downloadUrl.append(webUrl)
+            print(webUrl)
 
-    #在所有li中随机抽取5个链接添加到链接合集
-    urlList2 = random.sample(urlList , 5)
-    print("urlList2:")
-    print(urlList2)
-    for url in urlList2:
-        webUrl = url.find_element_by_tag_name("a").get_attribute("href")
-        downloadUrl.append(webUrl)
-        print(webUrl)
-
-    driver.quit()
+        driver.quit()
 
     return downloadUrl
 
@@ -40,9 +39,14 @@ def find_ImgSrc(downloadUrlList):
         browse.get(url)
         time.sleep(5)
         imgList = browse.find_elements_by_xpath("//div[@class='images']/img")
+
+        i = 1
+
         for img in imgList:
             imgUrl = img.get_attribute("src")
             downloadList.append(imgUrl)
+            print("正在加载第" + str(i) + "个文章的图片")
+            print(downloadList)
 
         browse.quit()
 
@@ -73,11 +77,28 @@ def download_img(download_file,download_url):
     except Exception as e:
         print("Exception")
 
+# 随机选前50页中的2页爬图片
+def get_WebsiteList(url):
+    pageList = random.sample(range(1,50),2)
+    print("获取图片的页数是:")
+    print(pageList)
+    for page in pageList:
+        if(page == 1):
+            download_WebsiteList.append(url)
+        else:
+            download_WebsiteList.append(url + "&page=" + str(page))
+
+    print(download_WebsiteList)
+    return download_WebsiteList
+
 def main():
-    webUrlList = find_Url(download_Website)
+    webList = get_WebsiteList(download_Website)
+    webUrlList = find_Url(webList)
     download = find_ImgSrc(webUrlList)
     download_img(downloadFile,download)
 
+#网页页数链接合集
+download_WebsiteList = []
 
 #获取图片所在的页面链接合集
 downloadUrl = []
